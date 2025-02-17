@@ -1,4 +1,5 @@
 import glob 
+import sys
 
 import math
 from datetime import timedelta
@@ -10,6 +11,11 @@ import xarray as xr
 
 import parcels
 
+dir = '/Users/mattiaromero/Projects/Github/ADVECTOR-Studies'
+sys.path.append(dir)
+from tools.drifter_dispersion import DrifterHandler
+
+# FIXME: remove 
 def WrapLongitudeKernel(particle, fieldset, time):
     if particle.lon > 180:
         particle.dlon = -360
@@ -34,7 +40,7 @@ class DrifterParticle(parcels.JITParticle):
 def Age(particle, fieldset, time):
     particle.age += particle.dt / 3600 # in hours
 
-def run_parcels_test(model: str, filenames: dict, variables: dict, dimensions: dict, indices: dict, drifter_df: pd.DataFrame, T: int, dt: int, savet: int, ):
+def run_parcels_test(model: str, filenames: dict, variables: dict, dimensions: dict, indices: dict, drifter_df: pd.DataFrame, T: int, dt: int, savet: int, out_folder: str):
     # QC 
     print("QC:")
 
@@ -72,7 +78,7 @@ def run_parcels_test(model: str, filenames: dict, variables: dict, dimensions: d
     )
 
     output_file = pset.ParticleFile(
-        name=f"{model}Particles.zarr", outputdt=timedelta(hours=savet)
+        name=f"{out_folder}/{model}Particles.zarr", outputdt=timedelta(hours=savet)
     )
 
     if model =="HYCOM":
@@ -110,16 +116,8 @@ def run_parcels_test(model: str, filenames: dict, variables: dict, dimensions: d
 
 # Load drifter tracks 
 drifter_folder = r"Y:/PROJECTS/DRIFTERS/data/qc_tdsi_6h_2"
-files = glob.glob(f"{drifter_folder}/*.csv")
-
-drifter_df = pd.DataFrame()
-for file in files: 
-    df = pd.read_csv(file)  
-    drifter_df = pd.concat([drifter_df, df], ignore_index=True)  
-
-drifter_df.rename(columns={"longitude": "lon", "latitude": "lat"}, inplace=True)
-drifter_df = drifter_df[drifter_df["deployed"] != False]
-drifter_df.drop(columns="deployed", inplace=True)
+drifter_handler = DrifterHandler(drifter_folder, _)
+drifter_df = drifter_handler.prepare()  
 
 # Define filters
 w, e, s, n = -160, -125, 20, 40
@@ -128,7 +126,7 @@ tend = '2022-01-31'
 
 wesn = (drifter_df.lon > w) & (drifter_df.lon < e) & (drifter_df.lat > s) & (drifter_df.lat < n)
 time = (drifter_df.time >= tstart) & (drifter_df.time <= tend)
-drifter_df["time"] = pd.to_datetime(drifter_df["time"])
+# drifter_df["time"] = pd.to_datetime(drifter_df["time"])
 tracks_df = drifter_df[time & wesn].reset_index(drop=True)
 tracks_df["id_nr"] = tracks_df.groupby("id").ngroup()
 
@@ -140,7 +138,7 @@ dt = 1
 savet = 6 
 
 dataset_folder = "F:/ADVECTOR/metocean"
-
+output_folder = "F:/PARCELS"
 
 model = "GLOBCURRENT"
 
@@ -157,7 +155,7 @@ dimensions = {"time": "time", "lat": "latitude", "lon": "longitude", "time": "ti
 
 indices = {'lon': range(0,4*60), 'lat': range(4*105,4*135)}
 
-run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet)
+run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet, output_folder)
 
 
 model = "GLORYS"
@@ -173,7 +171,7 @@ dimensions = {"time": "time", "lon": "longitude", "lat": "latitude"}
 
 indices = {"lon": range(0,12*60), "lat": range(12*95,12*125)}
 
-run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet)
+run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet, output_folder)
 
 
 model = "SMOC"
@@ -189,7 +187,7 @@ dimensions = {"time": "time", "lon": "longitude", "lat": "latitude"}
 
 indices = {"lon": range(0,12*60), "lat": range(12*95,12*125)}
 
-run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet)
+run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet, output_folder)
 
 
 model = "HYCOM"
@@ -204,7 +202,7 @@ dimensions = {"time": "time", "lon": "lon", "lat": "lat"}
 
 indices = {'lon': range(int(180*12.5), int(240*12.5)), 'lat': range(int(25*95),int(25*125))}
 
-run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet)
+run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet, output_folder)
 
 
 model = "ROMS"
@@ -229,7 +227,7 @@ dimensions = {
 
 indices = {"lon": range(0,600), "lat": range(0,375)}
 
-run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet)
+run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet, output_folder)
 
 
 model = "AMPHITRITE"
@@ -250,4 +248,4 @@ dimensions = {"time": "time", "lon": "longitude", "lat": "latitude"}
 
 indices = None
 
-run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet)
+run_parcels_test(model, filenames, variables, dimensions, indices, ics_df, T, dt, savet, output_folder)
