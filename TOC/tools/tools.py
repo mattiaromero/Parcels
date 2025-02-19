@@ -27,7 +27,7 @@ class DrifterParticle(parcels.JITParticle):
     drifter_id = parcels.Variable("drifter_id", dtype=np.float32, to_write=True) 
 
 def Age(particle, fieldset, time):
-    particle.age += particle.dt / 3600 # in hours
+    particle.age += particle.dt / (24) # in days, assumind dt in hours 
 
 def run_parcels_test(model: str, filenames: dict, variables: dict, dimensions: dict, indices: dict, drifter_df: pd.DataFrame, T: int, dt: int, savet: int, out_folder: str):
     # QC 
