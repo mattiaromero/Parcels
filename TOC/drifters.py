@@ -1,17 +1,19 @@
 import glob 
+import os
+from pathlib import Path
 import sys
 from tools.tools import * 
 
-dir = '/Users/mattiaromero/Projects/Github/ADVECTOR-Studies'
-sys.path.append(dir)
-from tools.drifter_dispersion import DrifterHandler
+dir = Path("C:/Users/toc2/Projects/GitHub/ADVECTOR-Studies/tools") # '/Users/mattiaromero/Projects/Github/ADVECTOR-Studies'
+sys.path.append(str(dir))
+from drifter_dispersion import DrifterHandler
 
 def prepare_tracks(drifter_df, w, e, s, n, tstart, tend, output_folder): 
     wesn = (drifter_df.lon > w) & (drifter_df.lon < e) & (drifter_df.lat > s) & (drifter_df.lat < n)
     time = (drifter_df.time >= tstart) & (drifter_df.time <= tend)
     tracks_df = drifter_df[time & wesn].reset_index(drop=True)
-    tracks_df["id_nr"] = tracks_df.groupby("id").ngroup()
-    # tracks_df["age"] = tracks_df.groupby("id_nr")["time"].transform(lambda x: (x - x.min()).dt.total_seconds() / 86400)
+    tracks_df["segment_n"] = tracks_df.groupby("segment_id").ngroup()
+    # tracks_df["age"] = tracks_df.groupby("segment_n")["time"].transform(lambda x: (x - x.min()).dt.total_seconds() / 86400)
     tracks_df.to_csv(f"{output_folder}/tracks_df.csv")
     return tracks_df
 
@@ -31,15 +33,12 @@ tend = '2022-01-31'
 
 # Prepare drifter df 
 tracks_df = prepare_tracks(drifter_df, w, e, s, n, tstart, tend, output_folder)
-ics_df = tracks_df.groupby("id_nr", group_keys=False).apply(lambda x: x.iloc[::4]) # IC @24h
+ics_df = tracks_df.groupby("segment_n", group_keys=False).apply(lambda x: x.iloc[::4]) # IC @24h
 
 # Define simulation parameters
 T = int((tracks_df.time.max() - tracks_df.time.min()).total_seconds()/3600) # 7*24 
 dt = 1
 savet = 6 
-
-dataset_folder = "F:/ADVECTOR/metocean"
-output_folder = "F:/PARCELS"
 
 # Define models 
 c_grid_dimensions = { # Note that all variables need the same dimensions in a C-Grid
@@ -121,7 +120,7 @@ models = [
 ]
 
 for model in models:
-    run_parcels_test(
+    run_drift_experiment(
         model["name"],
         model["filenames"],
         model["variables"],
