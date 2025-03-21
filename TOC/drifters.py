@@ -19,7 +19,7 @@ def prepare_tracks(drifter_df, w, e, s, n, tstart, tend, output_folder):
 
 # Define folders
 dataset_folder = "F:/ADVECTOR/metocean"
-output_folder = "F:/PARCELS"
+output_folder = "F:/PARCELS/test"
 drifter_folder = "Y:/PROJECTS/DRIFTERS/data/qc_tdsi_6h_2"
 
 # Load drifter tracks 
