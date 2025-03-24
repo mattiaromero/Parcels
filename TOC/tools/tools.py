@@ -39,9 +39,9 @@ def run_drift_experiment(model: str, filenames: dict, variables: dict, dimension
         print(attr, ":", model_xr.attrs[attr])
 
     if model == "ROMS":
-        fieldset = parcels.FieldSet.from_mitgcm(filenames, variables, dimensions, indices, allow_time_extrapolation=True)
+        fieldset = parcels.FieldSet.from_mitgcm(filenames, variables, dimensions, indices)
     else: 
-        fieldset = parcels.FieldSet.from_netcdf(filenames, variables, dimensions, indices, allow_time_extrapolation=True)
+        fieldset = parcels.FieldSet.from_netcdf(filenames, variables, dimensions, indices)
 
     print("")
     print("Dataset size:", len(fieldset.U.grid.lon)*len(fieldset.U.grid.lat)*len(fieldset.U.grid.time)) 

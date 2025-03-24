@@ -116,7 +116,7 @@ models = [
 for model in models:
     print(model)
     if model['name'] == "ROMS_C-GRID":
-        fieldset_c = parcels.FieldSet.from_nemo(model["filenames"], model["variables"], model["dimensions"], model["indices"]) # FIXME: same result with mitgcm 
+        fieldset_c = parcels.FieldSet.from_mitgcm(model["filenames"], model["variables"], model["dimensions"], model["indices"]) # FIXME: same result with mitgcm 
     elif model['name'] == "ROMS_A-GRID":
         fieldset_a = parcels.FieldSet.from_netcdf(model["filenames"], model["variables"], model["dimensions"])
 

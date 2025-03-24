@@ -40,10 +40,12 @@ T = int((tracks_df.time.max() - tracks_df.time.min()).total_seconds()/3600) # 7*
 dt = 1
 savet = 6 
 
-# Define models 
-c_grid_dimensions = { # Note that all variables need the same dimensions in a C-Grid
-    "lon": "lon_rho",
-    "lat": "lat_rho",
+##  Define models 
+# ROMS
+roms_mesh_mask = f"{dataset_folder}/grid_npo0.08_07e.nc"
+c_grid_dimensions = {
+    "lon": "lon_psi",
+    "lat": "lat_psi",
     "time": "ocean_time",
 }
 
@@ -97,15 +99,15 @@ models = [
     {
         "name": "ROMS", 
         "filenames": {
-            "U": f"{dataset_folder}/roms/test134cars_npo0.08_07e_2022*.nc", 
-            "V": f"{dataset_folder}/roms/test134cars_npo0.08_07e_2022*.nc"
+            "U": {"lon": roms_mesh_mask, "lat": roms_mesh_mask, "data": f"{dataset_folder}/roms_c-grid/test134cars_npo0.08_07e_2022*.nc"},
+            "V": {"lon": roms_mesh_mask, "lat": roms_mesh_mask, "data": f"{dataset_folder}/roms_c-grid/test134cars_npo0.08_07e_2022*.nc"}
         },
         "variables": {"U": "u", "V": "v"},
         "dimensions": {
             "U": c_grid_dimensions,
-            "V": c_grid_dimensions,
+            "V": c_grid_dimensions
         },
-        "indices": {"lon": range(0,600), "lat": range(0,375)}, 
+        "indices": {"lon": range(0,600), "lat": range(0,375)}
     },
     {
         "name": "AMPHITRITE", 
