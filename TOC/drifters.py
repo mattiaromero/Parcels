@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 from tools.tools import * 
 
-dir = Path("C:/Users/toc2/Projects/GitHub/ADVECTOR-Studies/tools") # '/Users/mattiaromero/Projects/Github/ADVECTOR-Studies'
+dir = Path("/Users/mattiaromero/Projects/Github/ADVECTOR-Studies/tools") # "C:/Users/toc2/Projects/GitHub/ADVECTOR-Studies/tools"
 sys.path.append(str(dir))
 from drifter_dispersion import DrifterHandler
 
@@ -18,9 +18,9 @@ def prepare_tracks(drifter_df, w, e, s, n, tstart, tend, output_folder):
     return tracks_df
 
 # Define folders
-dataset_folder = "F:/ADVECTOR/metocean"
-output_folder = "F:/PARCELS/test"
-drifter_folder = "Y:/PROJECTS/DRIFTERS/data/qc_tdsi_6h_2"
+dataset_folder = "/Users/mattiaromero/Data/parcels/test/metocean" # "F:/ADVECTOR/metocean"
+output_folder = "/Users/mattiaromero/Data/parcels/test/output/drones" # "F:/PARCELS/test"
+drifter_folder = "/Users/mattiaromero/Data/drifters/qc_tdsi_6h_2" # "Y:/PROJECTS/DRIFTERS/data/qc_tdsi_6h_2"
 
 # Load drifter tracks 
 drifter_handler = DrifterHandler(drifter_folder)

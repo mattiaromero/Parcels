@@ -48,8 +48,7 @@ def run_drift_experiment(model: str, filenames: dict, variables: dict, dimension
     print("Domain:", fieldset.U.grid.lon.min(), fieldset.U.grid.lon.max(),  fieldset.U.grid.lat.min(), fieldset.U.grid.lat.max())
     print("")
 
-    # Define a new particleclass with Variable 'age' with initial value 0.
-    # AgeParticle = parcels.JITParticle.add_variable(parcels.Variable("age", initial=0))
+    # fieldset.add_constant_field("Kh_zonal", 1, mesh="flat")
 
     pset = parcels.ParticleSet.from_list(
         fieldset=fieldset,
@@ -66,7 +65,7 @@ def run_drift_experiment(model: str, filenames: dict, variables: dict, dimension
     )
 
     if model =="HYCOM":
-        kernels = [Age, ConvertParticlesTo360, parcels.AdvectionRK4, ConvertParticlesTo180]
+        kernels = [Age, ConvertParticlesTo360, parcels.AdvectionRK4, ConvertParticlesTo180] # DiffusionUniformKh #AdvectionDiffusionM1 
 
         pset.execute(
             kernels, 
