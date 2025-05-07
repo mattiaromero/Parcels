@@ -1,3 +1,7 @@
+###
+# Validation project bechnmarking particles with drifter trajectories using various OGCMs. 
+###
+
 import glob 
 import os
 from pathlib import Path

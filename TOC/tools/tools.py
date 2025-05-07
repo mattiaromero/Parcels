@@ -14,8 +14,11 @@ def ConvertParticlesTo180(particle, fieldset, time):
         particle.lon -= 360  # Shift back to -180,180 range
 
 def DeleteParticle(particle, fieldset, time):
-    particle.delete()  # Remove particle from the simulation
-
+    if (particle.lon < fieldset.lonmin or particle.lon > fieldset.lonmax or
+        particle.lat < fieldset.latmin or particle.lat > fieldset.latmax):
+        
+        particle.delete()  # Remove particle from the simulation if out of domain or drifter has died
+        
 class DrifterParticle(parcels.JITParticle):
     age = parcels.Variable("age", dtype=np.float32, initial=0, to_write=True)  
     segment_id = parcels.Variable("segment_id", dtype=np.float32, to_write=True) 
