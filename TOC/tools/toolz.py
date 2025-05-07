@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
 from noise import pnoise2
 
-def perlin_noise(
+def PerlinNoise(
     n_particles=1000,
     grid_size=(200, 200),
     scale=50,
@@ -59,7 +60,7 @@ def perlin_noise(
 
     return np.column_stack([x_norm, y_norm])
 
-def perlin_noise_threshold(
+def PerlinNoiseThreshold(
     n_particles=1000,
     grid_size=(200, 200),
     scale=50,
@@ -111,3 +112,21 @@ def perlin_noise_threshold(
         plt.show()
 
     return np.column_stack([x_norm, y_norm])
+
+def DeleteParticle(particle, fieldset, time):
+    if (particle.lon < fieldset.lonmin or particle.lon > fieldset.lonmax or
+        particle.lat < fieldset.latmin or particle.lat > fieldset.latmax):
+        
+        particle.delete()  # Remove particle from the simulation if out of domain or drifter has died
+
+def CropBox(ds, wesn_box):
+
+    if "z" in ds.data_vars:
+        ds = ds.drop_vars("z")
+
+    mask = ((ds.lon >= wesn_box[0]) & (ds.lon <= wesn_box[1]) &
+            (ds.lat >= wesn_box[2]) & (ds.lat <= wesn_box[3])).compute()
+
+    ds = ds.where(mask, drop=True)
+
+    return ds
